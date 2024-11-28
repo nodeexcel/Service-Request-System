@@ -1,0 +1,458 @@
+<!-- <app-dash-panel></app-dash-panel> -->
+
+<div class="ticket-container {{this.navbarIsCollapsed === true ? 'widen' : ''}}" *ngIf="ticket">
+
+  <div class="ticket-heading">
+    <div class="backButton">
+      <i class="fa-solid fa-chevron-left" (click)="goBack()" tabindex="0" (keyup)="handleKeyUp()"></i>
+    </div>
+    <h1>{{ ticket.summary }}</h1>
+  </div>
+
+  <div class="ticket-summary-area">
+
+    <div class="summary-info">
+      <div class="summary-inner-info">
+        <div class="summary-header">
+          <div class="user-profile-img">
+            <img src="{{ assigneeImage }}" alt="user profile image">
+          </div>
+          <h2 *ngIf="assigneeUser"><span><b>{{ assigneeUser.name }}  {{ assigneeUser.surname }}</b></span> created this ticket on <span><b>{{ ticket.startDate }}</b></span></h2> <br>
+        </div>
+
+        <p><b>Description</b></p>
+        <p *ngIf="ticket.description"> {{ ticket.description }} </p>
+        <p *ngIf="!ticket.description">
+          No Ticket Description.
+        </p>
+
+        <div class="ticket-summary-area-todos" *ngIf="!todoEmpty()">
+          <p><b>Todo's</b></p>
+          <div class="ticket-summary-area-todos-list" *ngFor="let todo of ticket.todo; let i = index;">
+            <input type="checkbox" [checked]="ticket.todoChecked[i]" (change)="onCheckChanged(i)">
+            <label [ngClass]="{ 'completed': ticket.todoChecked[i] }" for="todoListItem">{{ todo }}</label>
+          </div>
+
+          <button *ngIf="checkChanges" (click)="saveTodos()" class="check-btn">Save Changes</button>
+        </div>
+      </div>
+
+      <div class="activity-area">
+        <h2 class = "activity-text">Activity</h2>
+
+        <button class="activity-filter-button selected" (click)="highlightButton($event); showAll(); activeTab='All'">All</button>
+        <button class="activity-filter-button" (click)="highlightButton($event); showCommentsOnly()">Comments</button>
+        <!-- <button class="activity-filter-button" (click)="highlightButton($event); showCommentsOnly()">Internal Note</button> -->
+        <button class="activity-filter-button" (click)="highlightButton($event); showHistoryOnly()">History</button>
+        <button class="activity-filter-button" [class.selected]="activeTab === 'Work Logs'" (click)="highlightButton($event); showWorkLogs()">Work Logs</button>
+        <button class="activity-filter-button" (click)="highlightButton($event); showAttachmentsOnly()">Attachments</button>
+
+        <div class="note-button-area">
+          <div class="user-profile-img">
+            <img src="{{userProfilePic}}" alt="user profile image">
+          </div>
+          <textarea [formControl]="commentInputControl" contenteditable="true" class="note-content" placeholder="Add a note..." (input)="adjustTextareaHeight($event.target)" [(ngModel)]="textareaValue"></textarea>
+          <label for="fileInput" class="file-input-label">
+            <input type="file" id="fileInput" class="file-input" (change)="onFileChange($event)" />
+          </label>
+        </div>
+
+        <div class="save-btn-container">
+        <!-- <button (click)="addComment()" class="save-btn">Save</button> -->
+          <button (click)="saveData()" class="save-btn">Save</button>
+        </div>
+
+        <div class="attachment-preview" *ngIf="preview">
+          <ng-container *ngIf="isPDF(file!.name)">
+            <div class = "pdf-preview">
+              <img src="../../assets/pdf.png" style = "max-width: 100px;" style = "max-height: 100px;" alt="PDF Attachment Preview" />
+            </div>
+          </ng-container>
+          <ng-container *ngIf="!isPDF(file!.name)">
+            <img [src]="preview" alt="Image Attachment Preview" />
+          </ng-container>
+          <input type="text" class="attachment-filename" [(ngModel)]="editedAttachmentName" (input)="updateEditedAttachmentName($event)" [placeholder]="file?.name" />
+        </div>
+
+        <!-- <mat-progress-bar mode="determinate" [value]="uploadProgress"></mat-progress-bar> -->
+
+        <!-- <div class="comments-area" *ngFor="let comment of ticket.comments">
+          <app-comment-panel [comment]="comment"></app-comment-panel>
+          <div class = "ticket-attachment">
+            <ng-container *ngIf="comment.attachment?.url">
+              <a *ngIf="isPDF(comment.attachment!.url)" [href]="comment.attachment?.url" target="_blank">'{{comment.attachment!.name}}'</a>
+              <img *ngIf="!isPDF(comment.attachment!.url)" [src]="comment.attachment?.url" alt="Attachment">
+              <a *ngIf="!isPDF(comment.attachment!.url)" [href]="comment.attachment?.url" download>'{{comment.attachment!.name}}'</a>
+            </ng-container>
+          </div>
+        </div> -->
+        <div class = "comments-area-with-attachments" *ngIf="attachmentsOnly === false" >
+          <div class = "comments-area" *ngFor="let comment of displayedComments">
+            <app-comment-panel [comment]="comment"></app-comment-panel>
+            <mat-expansion-panel class = "comment-panel" style = "margin: 20px; margin-left:85px; max-height: 300px; overflow-y: auto;"  *ngIf="comment?.attachment?.name;">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <span>{{ comment.content }} <br>
+                    <a [href] = "comment.attachment!.url">{{comment.attachment?.name}}</a>
+
+                  </span>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <div class="ticket-attachment">
+                <ng-container *ngIf="comment?.attachment?.name; ">
+                  <!-- <a *ngIf="isPDF(comment.attachment!.url)" [href]="comment.attachment?.url" target="_blank" >'{{comment.attachment!.name}}'</a> -->
+                  <img *ngIf="!isPDF(comment.attachment!.url)" [src]="comment.attachment?.url" alt="Attachment">
+                  <!-- <a *ngIf="!isPDF(comment.attachment!.url)" [href]="comment.attachment?.url" download>{{ comment.attachment!.name }}</a> -->
+                </ng-container>
+                <ng-template #noAttachments>
+                  No attachments
+                </ng-template>
+              </div>
+            </mat-expansion-panel>
+            <p *ngIf="!comment?.attachment?.name" style = "margin-left: 80px;">
+              {{comment.content}}
+            </p>
+            <!-- <p *ngIf="isPDF(comment?.attachment!.url)">
+              {{comment.content}} <br>
+              <a [href] = "comment.attachment?.url"> {{comment.attachment?.name}}</a>
+            </p> -->
+          </div>
+          <div *ngFor="let worklog of displayedWorklogs">
+            <app-worklog-panel [worklog]="worklog"></app-worklog-panel>
+          </div>
+          <div *ngFor = "let history of displayedHistory">
+            <div  *ngIf = "!historyOnly">
+              <app-history-panel [history] = "history"></app-history-panel>
+            </div>
+          </div>
+        </div>
+
+        <div class = "attachments-only" *ngIf="attachmentsOnly">
+          <div class = "comments-area" *ngFor="let comment of displayedComments">
+            <app-comment-panel [comment]="comment"></app-comment-panel>
+            <mat-expansion-panel class = "comment-panel" style = "margin: 20px;"  *ngIf="comment?.attachment?.name;">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <span>{{ comment.content }} <br>
+                    <a [href] = "comment.attachment!.url">{{comment.attachment?.name}}</a>
+
+                  </span>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <div class="ticket-attachment">
+                <ng-container *ngIf="comment?.attachment?.name; ">
+                  <!-- <a *ngIf="isPDF(comment.attachment!.url)" [href]="comment.attachment?.url" target="_blank" >'{{comment.attachment!.name}}'</a> -->
+                  <img *ngIf="!isPDF(comment.attachment!.url)" [src]="comment.attachment?.url" alt="Attachment">
+                  <!-- <a *ngIf="!isPDF(comment.attachment!.url)" [href]="comment.attachment?.url" download>{{ comment.attachment!.name }}</a> -->
+                </ng-container>
+                <ng-template #noAttachments>
+                  No attachments
+                </ng-template>
+              </div>
+            </mat-expansion-panel>
+            <!-- <p *ngIf="!comment?.attachment?.name" style = "margin-left: 60px;">
+              {{comment.content}}
+            </p> -->
+          </div>
+        </div>
+
+        <div class = "comments-only" *ngIf="attachmentsOnly">
+          <div class = "comments-area" *ngFor="let comment of displayedComments">
+            <app-comment-panel [comment]="comment"></app-comment-panel>
+            <mat-expansion-panel class = "comment-panel" style = "margin: 20px;"  *ngIf="comment?.attachment?.name;">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <span>{{ comment.content }} <br>
+                    <a [href] = "comment.attachment!.url">{{comment.attachment?.name}}</a>
+
+                  </span>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <div class="ticket-attachment">
+                <ng-container *ngIf="comment?.attachment?.name; ">
+                  <!-- <a *ngIf="isPDF(comment.attachment!.url)" [href]="comment.attachment?.url" target="_blank" >'{{comment.attachment!.name}}'</a> -->
+                  <img *ngIf="!isPDF(comment.attachment!.url)" [src]="comment.attachment?.url" alt="Attachment">
+                  <!-- <a *ngIf="!isPDF(comment.attachment!.url)" [href]="comment.attachment?.url" download>{{ comment.attachment!.name }}</a> -->
+                </ng-container>
+                <ng-template #noAttachments>
+                  No attachments
+                </ng-template>
+              </div>
+            </mat-expansion-panel>
+            <!-- <p *ngIf="!comment?.attachment?.name" style = "margin-left: 60px;">
+              {{comment.content}}
+            </p> -->
+          </div>
+        </div>
+
+        <div class = "comments-only" *ngIf="attachmentsOnly">
+          <div class = "comments-area" *ngFor="let comment of displayedComments">
+            <app-comment-panel [comment]="comment"></app-comment-panel>
+            <mat-expansion-panel class = "comment-panel" style = "margin: 20px;"  *ngIf="comment?.attachment?.name;">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <span>{{ comment.content }} <br>
+                    <a [href] = "comment.attachment!.url">{{comment.attachment?.name}}</a>
+
+                  </span>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <div class="ticket-attachment">
+                <ng-container *ngIf="comment?.attachment?.name; ">
+                  <!-- <a *ngIf="isPDF(comment.attachment!.url)" [href]="comment.attachment?.url" target="_blank" >'{{comment.attachment!.name}}'</a> -->
+                  <img *ngIf="!isPDF(comment.attachment!.url)" [src]="comment.attachment?.url" alt="Attachment">
+                  <!-- <a *ngIf="!isPDF(comment.attachment!.url)" [href]="comment.attachment?.url" download>{{ comment.attachment!.name }}</a> -->
+                </ng-container>
+                <ng-template #noAttachments>
+                  No attachments
+                </ng-template>
+              </div>
+            </mat-expansion-panel>
+            <!-- <p *ngIf="!comment?.attachment?.name" style = "margin-left: 60px;">
+              {{comment.content}}
+            </p> -->
+          </div>
+        </div>
+
+        <div class="worklogs-and-comments" *ngIf="activeTab ==='Work Logs'">
+          <div *ngFor="let worklog of displayedWorklogs">
+            <app-worklog-panel [worklog]="worklog"></app-worklog-panel>
+          </div>
+          <!-- <div *ngFor="let comment of displayedComments">
+            <app-comment-panel [comment]="comment"></app-comment-panel>
+          </div> -->
+        </div>
+
+        <div class = "history" *ngIf = "historyOnly">
+          <div *ngFor = "let history of displayedHistory">
+            <app-history-panel [history] = "history"></app-history-panel>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="ticket-info-area">
+      <h1>Ticket Information</h1>
+      <div class="button-area">
+        <mat-form-field color="primary">
+          <mat-label><span class="whiteText">{{ticket.status}}</span></mat-label>
+          <mat-select [(value)]="selectedStatus" (valueChange)="updateTicketStatus()">
+            <mat-option *ngIf="ticket.status !== 'Pending'" [value]="'Pending'">Change to Pending</mat-option>
+            <mat-option *ngIf="ticket.status !== 'Active'" [value]="'Active'">Change to Active</mat-option>
+            <mat-option *ngIf="ticket.status !== 'Done'" [value]="'Done'">Change to Done</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!-- <button class="update-status-button" mat-raised-button color="primary" (click)="updateTicketStatus()">Update Status</button> -->
+      </div>
+
+      <button class="rounded-button" (click)="toggleForm()">Log Work Hours</button>
+
+      <div class="sla-area">
+        <mat-expansion-panel (opened)="SLAPanelOpenState = true"
+                            (closed)="SLAPanelOpenState = false" [expanded]="SLAPanelOpenState">
+          <mat-expansion-panel-header class="specific-class">
+            <mat-panel-title class="mat-title">
+              SLA
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div class="expansion-item" *ngIf = "timeToFirstResponse !== 'pending'">
+            <p class="bold-label">Time to first response </p>
+            <p class="p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg">{{timeToFirstResponse}} <i class="fa-regular fa-clock"></i></p>
+          </div>
+
+          <div class="expansion-item" *ngIf = "timeToFirstResponse === 'pending'">
+            <p class="bold-label">Time to first response </p>
+            <p class="p-1.5 text-xs font-medium uppercase tracking-wider text-yellow-800 bg-yellow-200 rounded-lg">{{timeToFirstResponse}} <i class="fa-regular fa-clock"></i></p>
+          </div>
+
+          <div class="expansion-item" *ngIf = "timeToTicketResolution !== 'pending'">
+            <p class="bold-label">Time to resolution </p>
+            <p class="p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg">{{timeToTicketResolution}}  <i class="fa-regular fa-clock"></i></p>
+          </div>
+
+          <div class="expansion-item" *ngIf = "timeToTicketResolution === 'pending'">
+            <p class="bold-label">Time to resolution </p>
+            <p class="p-1.5 text-xs font-medium uppercase tracking-wider text-yellow-800 bg-yellow-200 rounded-lg">{{timeToTicketResolution}}  <i class="fa-regular fa-clock"></i></p>
+          </div>
+        </mat-expansion-panel>
+      </div>
+
+      <div class="details-area">
+        <mat-expansion-panel (opened)="detailsPanelOpenState = true"
+                            (closed)="detailsPanelOpenState = false" [expanded]="detailsPanelOpenState">
+          <mat-expansion-panel-header class="specific-class">
+            <mat-panel-title class="mat-title">
+              Details
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div class = "expansion-item">
+            <p>Group</p>
+            <div class="content-2">
+              <p class="assigned-text-2">{{assignedGroup}}</p>
+            </div>
+          </div>
+
+          <div class="expansion-item">
+            <p class="bold-label">Assignee</p>
+            <div class="content">
+              <div class="user-img">
+                <img src = {{assigneeImage}} alt= "assignee-image">
+              </div>
+              <p class="assigned-text">{{assigneeName}}</p>
+            </div>
+          </div>
+
+          <div class="expansion-item">
+            <p>Assigned</p>
+            <app-user-dropdown [groupName]="assignedGroup" [currentAssigned]="currentAssigned" (userSelected)="userSelected($event)"></app-user-dropdown>
+          </div>
+
+          <div class="expansion-item flex-start">
+            <p class = "priority-text">Priority </p>
+            <div *ngIf = "lowPriority" class = "priority-low">
+              <div class = "low-container">
+                <p class="text-low">
+                  LOW
+                </p>
+              </div>
+            </div>
+
+            <div *ngIf = "medPriority" class = "priority-medium">
+              <div class = "medium-container">
+                <p class="medium-low">
+                  MEDIUM
+                </p>
+              </div>
+            </div>
+
+            <div *ngIf = "highPriority" class = "priority-high">
+              <div class = "high-container">
+                <p class="high-low">
+                  HIGH
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="expansion-item flex-start">
+            <p class = "created-text">Created</p>
+            <p class="left-margin">{{ticket.startDate}}</p>
+          </div>
+          <div class="expansion-item flex-start">
+            <p>Deadline</p>
+            <p class="left-margin">{{ticket.endDate}}</p>
+          </div>
+        </mat-expansion-panel>
+      </div>
+    </div>
+
+  </div>
+
+  <app-page-header></app-page-header>
+
+  <div class="modal" *ngIf="isFormVisible">
+    <div class="modal-content">
+        <!-- Link form with Angular formGroup -->
+        <form [formGroup]="workLogForm" (ngSubmit)="onSubmit()">
+            <h2 class="modal-header" >Time tracking</h2>
+            <hr style="border-color: -webkit-linear-gradient(left, rgba(4, 83, 142) 0%, rgba(0, 196, 255) 100%,); width: 100%; margin-bottom: 15px">
+            <div class="time-fields">
+                <div class="form-group">
+                    <label for="timeSpent">Time Spent:</label>
+                    <!-- Bind control to formControlName -->
+                    <input id="timeSpent" formControlName="timeSpent">
+                </div>
+                <div class="form-group">
+                    <label for="timeRemaining">Time Remaining:</label>
+                    <input id="timeRemaining" formControlName="timeRemaining">
+                </div>
+            </div>
+            <p>Use the format: 2w 4d 6h 45m</p>
+            <p>&bull; w = weeks</p>
+            <p>&bull; d = days</p>
+            <p>&bull; h = hours</p>
+            <p>&bull; m = minutes</p>
+
+            <div class="date-time-fields">
+                <div class="form-group">
+                    <label for="dateStarted">Date Started:</label>
+                    <input type="date" id="dateStarted" formControlName="dateStarted">
+                </div>
+                <div class="form-group">
+                    <label for="timeStarted">Time Started:</label>
+                    <input type="time" id="timeStarted" formControlName="timeStarted">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <!-- quill-editor uses ngModel. However, for consistency, using formControlName would be recommended. For now, I'll leave it as it is. -->
+                <quill-editor formControlName="description"></quill-editor>
+
+            </div>
+            <div class="button-group">
+                <button class = "save-button-worklog" type="submit">Save</button>
+                <button type="button" (click)="cancel()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!--
+  <table class="individual-ticket">
+    <tr>
+      <td class="ticket-item">
+        <div class="ticket">
+          <a class="card" [routerLink]="['/ticket', ticket.id]">{{ticket.id}}</a>
+        </div>
+      </td>
+      <td class="ticket-item">
+        <div class="ticket">
+          <h2 class="card">{{ ticket.summary }}</h2>
+        </div>
+      </td>
+      <td class="ticket-item assignee">
+        <div class="ticket">
+          <img src="assets/profile-icon.png" alt="Profile icon">
+          <p class="card">{{ ticket.assignee }}</p>
+        </div>
+      </td>
+      <td class="ticket-item">
+        <div class="ticket">
+          <p class="card">{{ ticket.assigned }}</p>
+        </div>
+      </td>
+      <td class="ticket-item">
+        <div class="ticket">
+          <p class="card">{{ ticket.group }}</p>
+        </div>
+      </td>
+      <td class="ticket-item">
+        <div class="ticket">
+          <p class="card">
+            <span [ngClass]="{'high': ticket.priority === 'High', 'medium': ticket.priority === 'Medium', 'low': ticket.priority === 'Low'}" class="priority-bubble">
+              {{ticket.priority}}
+            </span>
+          </p>
+        </div>
+      </td>
+      <td class="ticket-item">
+        <div class="ticket">
+          <p class="card">{{ ticket.startDate }}</p>
+        </div>
+      </td>
+      <td class="ticket-item">
+        <div class="ticket">
+          <p class="card">{{ ticket.endDate }}</p>
+        </div>
+      </td>
+      <td class="ticket-item">
+        <div class="ticket">
+          <p class="card">{{ ticket.status }}</p>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div> -->
