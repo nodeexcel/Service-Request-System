@@ -1,0 +1,212 @@
+.flipped-video {
+  transform: scaleX(-1);
+}
+
+.video-container{
+  background: -webkit-linear-gradient(left, #DE3DBF 10%, #67219E 100%, #fff 150%);
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: scroll;
+}
+
+.background-img{
+  position: fixed;
+  bottom: -10em;
+  z-index: -1000;
+}
+
+.header-container{
+  padding-top: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.logo-container{
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  cursor: pointer;
+  margin-left: 2em;
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 0px;
+}
+
+.logo-container h1 {
+  display: inline-block;
+  inline-size: min-content;
+  font-family: "Futura Pt", sans-serif;
+  font-size: 40px;
+  background: -webkit-linear-gradient(23deg, #67219E 10%, #00C4FF 180%, #fff 210%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.03em;
+  margin-bottom: 0;
+  font-weight: 500;
+}
+
+.logo-container img {
+  width: 4em;
+  height: 4em;
+  margin-right: 1em;
+  margin-bottom: 0px;
+}
+
+.video-outer-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.video-inner-container {
+  background-color: rgba(255,255,255,1);
+  width: 90%;
+  height: 100%;
+  margin-top: 1em;
+  border-radius: 0.5em;
+  padding: 0.7em;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400;
+  margin-bottom: 3em;
+  position: relative;
+  padding-bottom: 0.7em;
+
+  h4 {
+    margin: 0;
+    margin-left: 1em;
+  }
+
+  .userId {
+    font-size: 0.7em;
+    opacity: 0.7;
+    margin-left: 2em;
+  }
+
+  #remote-video {
+    width: 100%;
+    height: 100vh;
+    border-radius: 0.7em;
+    background-color: rgb(85, 85, 91);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+
+    img {
+      width: 30%;
+    }
+  }
+
+  .text-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    p {
+      margin: 1em;
+      color: white;
+      display: flex;
+    }
+  }
+}
+
+.buttons {
+  // background: rgb(0,0,0);
+  // background: linear-gradient(0deg, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 150%);
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  bottom: 0.7em;
+  width: 100%;
+
+  button {
+    width: 4em;
+    height: 4em;
+    background-color: rgb(133, 133, 142);
+    margin: 0.8em;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+      width: 55%;
+    }
+  }
+
+  #endCallBtn {
+    background-color: #f72963;
+  }
+}
+
+.local-video-wrapper {
+  width: 20%;
+  background-color: rgb(6, 6, 6);
+  height: 20vh;
+  position: absolute;
+  right: 1em;
+  bottom: 1em;
+  border-radius: 0.7em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+#local-video {
+  object-fit: fill;
+  border-radius: 0.7em;
+}
+
+.user-disconnected-prompt-wrapper {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .user-disconnected-prompt-inner-wrapper {
+    width: 45vw;
+    height: 20vh;
+    background-color: white;
+    border-radius: 0.7em;
+    padding: 2em;
+
+    h2 {
+      font-family: 'Poppins';
+      font-size: 1.4em;
+      font-weight: bolder;
+    }
+
+    button {
+      background: -webkit-linear-gradient(left, rgba(4, 83, 142) 0%, rgba(0, 196, 255) 100%,);
+      font-family: 'Poppins';
+      box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.18);
+      color: white;
+      padding: 0.8em;
+      padding-left: 1em;
+      padding-right: 1em;
+      border-radius: 0.3em;
+      margin-top: 1.5em;
+      margin-right: 1.5em;
+      min-width: 8em;
+      transition: all 300ms;
+    }
+
+    button:hover {
+      background: -webkit-linear-gradient(left, rgb(5, 105, 181) 0%, rgb(38, 203, 253) 100%,);
+    }
+  }
+}

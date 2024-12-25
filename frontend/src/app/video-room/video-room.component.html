@@ -1,0 +1,61 @@
+<div class="video-container">
+  <img src="/assets/client_background.svg" alt="background image" class="background-img">
+
+  <div class="header-container">
+    <div class="logo-container">
+      <img src="/assets/app_logo_transparent.png" alt="app logo">
+      <h1>LUNA</h1>
+    </div>
+  </div>
+
+  <div class="video-outer-container">
+    <div class="video-inner-container">
+      <h4>Please hold for one our staff to assist you</h4>
+      <p class="userId">{{peerId}}</p>
+      <div id="remote-video">
+        <div class="text-content" *ngIf="!lazyStream">
+          <img src="../../assets/user.png" alt="user">
+          <p>Waiting for someone in our team to connect</p>
+          <mat-spinner color="accent" diameter="20" class="loading"></mat-spinner>
+        </div>
+      </div>
+
+      <div class="local-video-wrapper">
+        <video id="local-video" class="video flipped-video" autoplay></video>
+      </div>
+
+      <div class="buttons">
+
+        <button class="button" (click)="toggleCamera()">
+          <img src="../../assets/video-camera.png" alt="video-camera">
+        </button>
+
+        <button class="button">
+          <img src="../../assets/mic.png" alt="mic">
+        </button>
+
+        <button class="button" (click)="screenShare()" id="shareButton">
+          <img src="../../assets/share-video-off.png" alt="video-share">
+        </button>
+
+        <button class="button" id="endCallBtn" (click)="endCall()">
+          <img src="../../assets/end-call.png" alt="end-call">
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div class="user-disconnected-prompt-wrapper" *ngIf="isConnectionClosed">
+    <div class="user-disconnected-prompt-inner-wrapper">
+      <h2>The other user has disconnected!</h2>
+      <button (click)="navigateOut()">OK</button>
+    </div>
+  </div>
+
+  <!-- <div style="margin-top: 20px;">
+    <input type="text" placeholder="peer id" [(ngModel)]="peerIdShare" style="z-index: 1000000;">
+  </div> -->
+
+</div>
