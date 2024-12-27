@@ -1,0 +1,168 @@
+// @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.ticket-container {
+  font-family: "Poppins", sans-serif;
+  // font-weight: bolder;
+
+  animation: fadeIn 2s;
+}
+
+.functional-table {
+  background-color: red;
+  width: 100vw;
+}
+// table {
+//   display: grid;
+//   border-collapse: collapse;
+//   min-width: 100%;
+//   /* These are just initial values which are overriden using JavaScript when a column is resized */
+//   grid-template-columns:
+//     minmax(150px, 1fr)
+//     minmax(150px, 1.67fr)
+//     minmax(150px, 1.67fr)
+//     minmax(150px, 1.67fr)
+//     minmax(150px, 3.33fr)
+//     minmax(150px, 1.67fr)
+//     minmax(150px, 3.33fr)
+//     minmax(150px, 1.67fr)
+//     minmax(150px, 1.67fr);
+// }
+
+// thead,
+// tbody,
+// tr {
+//   display: contents;
+// }
+
+// th,
+// td {
+//   padding: 15px;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+//   white-space: nowrap;
+//   border-bottom: 1px solid #494945;
+//   border-top: 1px solid #494945;
+// }
+
+// th {
+//   position: sticky;
+//   top: 0;
+//   background: white;
+//   text-align: left;
+//   font-weight: normal;
+//   font-size: 1.1rem;
+//   color: black;
+//   position: relative;
+// }
+
+// th:last-child {
+//   border: 0;
+// }
+
+// .resize-handle {
+//   position: absolute;
+//   top: 0;
+//   right: 0;
+//   bottom: 0;
+//   background: black;
+//   opacity: 0;
+//   width: 3px;
+//   cursor: col-resize;
+// }
+
+// .resize-handle:hover,
+// /* The following selector is needed so the handle is visible during resize even if the mouse isn't over the handle anymore */
+// .header--being-resized .resize-handle {
+//   opacity: 0.5;
+// }
+
+// th:hover .resize-handle {
+//   opacity: 0.3;
+// }
+
+// td {
+//   padding-top: 10px;
+//   padding-bottom: 10px;
+//   color: #000;
+// }
+
+// tr:nth-child(even) td {
+//   background: #CCC;
+// }
+
+/*th {
+
+    z-index: -1;
+}*/
+
+.pointer:hover{
+  cursor: pointer;
+}
+
+.index {
+    // z-index: -1;
+}
+
+.no-ticket-yet {
+  width: 98%;
+  margin: 1em;
+  border: 2px dashed rgba(0,0,0,0.4);
+  padding: 1em;
+  border-radius: 0.8em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  button {
+    background: -webkit-linear-gradient(left, rgba(4, 83, 142) 0%, rgba(0, 196, 255) 100%,);
+    font-family: 'Poppins';
+    font-size: 1.2em;
+    color: white;
+    padding: 0.8em;
+    border-radius: 0.3em;
+    margin-top: 0.5em;
+    min-width: 10em;
+  }
+
+  p {
+    font-size: 0.8em;
+    margin-top: 0.4em;
+  }
+}
+
+td {
+  font-size: 0.8em;
+}
+
+.priority-span {
+  min-width: 80%;
+  max-width: 80%;
+  text-align: center;
+}
+
+.service-down-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 1em;
+
+  .service-down {
+    padding: 1em;
+    display: flex;
+    align-items: center;
+    background-color: #cc2851;
+    color: white;
+    border-radius: 0.4em;
+  }
+
+  i {
+    margin-right: 1em;
+    font-size: 1.3em;
+  }
+}
